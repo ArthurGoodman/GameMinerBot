@@ -28,15 +28,19 @@ namespace GameMinerBot {
 
         static void Main(string[] args) {
             LoadSettings();
+
             Run("coal");
             Run("sandbox");
+
+            Console.WriteLine("Press any key...");
+            Console.ReadKey();
         }
 
         static void Run(string category) {
             Console.WriteLine("Category: " + category + "\n");
 
             for (int i = 1; true; i++) {
-                Console.WriteLine("Page " + i + ":");
+                Console.WriteLine("Page " + i);
 
                 HtmlDocument doc = new HtmlDocument();
                 doc.LoadHtml(GetPage("http://gameminer.net/giveaway/" + category + "?type=&filter_entered=on&q=&sortby=finish&order=asc&page=" + i));
@@ -67,7 +71,6 @@ namespace GameMinerBot {
 
         static IEnumerable<HtmlNode> GetElementsByClass(HtmlNode node, string name, string _class) {
             return node.Descendants(name).Where(d => d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains(_class));
-
         }
 
         static void LoadSettings() {
