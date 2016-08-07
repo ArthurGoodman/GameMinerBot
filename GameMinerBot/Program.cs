@@ -36,6 +36,22 @@ namespace GameMinerBot {
             Console.ReadKey();
         }
 
+        static void LoadSettings() {
+            settings = new Settings();
+
+            XmlSerializer s = new XmlSerializer(typeof(Settings));
+
+            if (File.Exists(SettingsFileName)) {
+                Stream stream = File.OpenRead(SettingsFileName);
+                settings = (Settings)s.Deserialize(stream);
+                stream.Close();
+            }
+
+            StreamWriter writer = new StreamWriter(SettingsFileName);
+            s.Serialize(writer, settings);
+            writer.Close();
+        }
+
         static void Run(string category) {
             Console.WriteLine("Category: " + category + "\n");
 
@@ -70,33 +86,7 @@ namespace GameMinerBot {
         }
 
         static IEnumerable<HtmlNode> GetElementsByClass(HtmlNode node, string name, string _class) {
-            return node.Descendants(name).Where(d => d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains(_class));
-        }
-
-        static void LoadSettings() {
-            settings = new Settings();
-
-            XmlSerializer s = new XmlSerializer(typeof(Settings));
-
-            if (File.Exists(SettingsFileName)) {
-                Stream stream = File.OpenRead(SettingsFileName);
-                settings = (Settings)s.Deserialize(stream);
-                stream.Close();
-            }
-
-            StreamWriter writer = new StreamWriter(SettingsFileName);
-            s.Serialize(writer, settings);
-            writer.Close();
-
-        }
-
-        static void JoinGiveaway(string id) {
-            using (WebClient client = new WebClient()) {
-                client.Headers["User-Agent"] = settings.UserAgent;
-                client.Headers.Add(HttpRequestHeader.Cookie, "_xsrf=" + settings.Xsrf + ";token=" + settings.Token);
-
-                client.UploadValues("http://gameminer.net/giveaway/enter/" + id, new NameValueCollection() { { "_xsrf", settings.Xsrf } });
-            }
+            return node.Descendants(name).Where(n => n.Attributes.Contains("class") && n.Attributes["class"].Value.Contains(_class));
         }
 
         static string GetPage(string url) {
@@ -109,6 +99,15 @@ namespace GameMinerBot {
             request.CookieContainer.Add(request.RequestUri, new Cookie("token", settings.Token));
 
             return new StreamReader(request.GetResponse().GetResponseStream()).ReadToEnd();
+        }
+
+        static void JoinGiveaway(string id) {
+            using (WebClient client = new WebClient()) {
+                client.Headers["User-Agent"] = settings.UserAgent;
+                client.Headers.Add(HttpRequestHeader.Cookie, "_xsrf=" + settings.Xsrf + ";token=" + settings.Token);
+
+                client.UploadValues("http://gameminer.net/giveaway/enter/" + id, new NameValueCollection() { { "_xsrf", settings.Xsrf } });
+            }
         }
     }
 }
