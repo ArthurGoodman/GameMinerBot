@@ -55,11 +55,11 @@ namespace GameMinerBot {
         static void Run(string category) {
             Console.WriteLine("Category: " + category + "\n");
 
-            for (int i = 1; true; i++) {
-                Console.WriteLine("Page " + i);
+            for (int page = 1; true; page++) {
+                Console.WriteLine("Page " + page);
 
                 HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(GetPage("http://gameminer.net/giveaway/" + category + "?type=&filter_entered=on&q=&sortby=finish&order=asc&page=" + i));
+                doc.LoadHtml(GetPage("http://gameminer.net/giveaway/" + category + "?type=&filter_entered=on&q=&sortby=finish&order=asc&page=" + page));
 
                 var giveawayDivs = GetElementsByClass(doc.DocumentNode, "div", "c-giveaway");
 
@@ -77,7 +77,7 @@ namespace GameMinerBot {
                         if (giveawayName.Count() > 0)
                             Console.Write(giveawayName.First().InnerHtml);
 
-                        JoinGiveaway(div.Attributes["data-code"].Value.ToString());
+                        JoinGiveaway(div.Attributes["data-code"].Value);
                     }
                 }
             }
